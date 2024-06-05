@@ -23,5 +23,6 @@
         *ngIf="action=='edit'"
         [entityNames]="entityNamesAll"
         [data]="data"
+        (formEmit)="handleFormChange($event)"
     ></app-entity-form>
 </div>

@@ -13,7 +13,7 @@ export class EntityFormComponent {
 
   form: any;
 
-  @Output() formChange = new EventEmitter<any>()
+  @Output() formEmit = new EventEmitter<any>()
 
   constructor (private fb: FormBuilder) {}
 
@@ -50,7 +50,8 @@ export class EntityFormComponent {
      * Categories
      * Images
      */
-    console.log(this.form.value);
+
+    this.formEmit.emit({type: "NORMAL", form: this.form.value})
 
   }
 

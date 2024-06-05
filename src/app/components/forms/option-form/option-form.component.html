@@ -1,0 +1,55 @@
+<div class="option_container">
+    <div
+        class="py-2"
+        *ngFor="let option of options"
+    >
+        <!--  -->
+        <div class="d-flex align-items-center gap-2">
+            <strong>Name</strong>
+            <input
+                type="text"
+                class="form-control"
+                [value]="option.name"
+                id
+            >
+            <button class="btn btn-danger">
+                <i class="fa fa-trash"></i>
+            </button>
+        </div>
+        <!--  -->
+        <div
+            class="d-flex align-items-center gap-2"
+            *ngFor="let item of option.values; let index = index"
+        >
+            <strong>Value {{ index + 1 }}</strong>
+            <input
+                type="text"
+                class="form-control"
+                [value]="item.value"
+                id
+            >
+            <button class="btn btn-danger">
+                <i class="fa fa-trash"></i>
+            </button>
+        </div>
+        <!--  -->
+        <div class="d-flex align-items-center gap-2">
+            <button
+                class="btn btn-primary"
+                (click)="addOptionValue(option._id)"
+            >
+                <i class="fa fa-plus"></i>
+                Add New Value
+            </button>
+        </div>
+    </div>
+</div>
+<div class="d-flex">
+    <button
+        class="btn btn-success"
+        (click)="addOption()"
+    >
+        <i class="fa fa-plus"></i>
+        Add New Option
+    </button>
+</div>

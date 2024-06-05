@@ -4,7 +4,8 @@ enum Type {
   INPUT = "INPUT", // => Champ de saisie
   SELECT = "SELECT", // => Champ de sélection
   TEXT = "TEXT", // => Champ de texte
-  IMAGE = "IMAGE" // => affichage d'image
+  IMAGE = "IMAGE", // => affichage d'image
+  OPTION = "OPTION" // => affichage d'une option
 }
 
 @Pipe({
@@ -32,6 +33,10 @@ export class FormatTypePipe implements PipeTransform {
     // Affiche une image
     if (name === "imageUrls") {
       type = Type.IMAGE
+    }
+    // Affiche une option
+    if (name === "options") {
+      type = Type.OPTION
     }
 
     return type;

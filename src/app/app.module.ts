@@ -24,6 +24,7 @@ import { EntityFormComponent } from './components/entity-form/entity-form.compon
 import { FormatFormValuePipe } from './pipes/format-form-value.pipe';
 import { FormatTypePipe } from './pipes/format-type.pipe';
 import { ImageViewComponent } from './components/image-view/image-view.component';
+import { OptionFormComponent } from './components/forms/option-form/option-form.component';
 
 @NgModule({
   declarations: [
@@ -46,7 +47,8 @@ import { ImageViewComponent } from './components/image-view/image-view.component
     EntityFormComponent,
     FormatFormValuePipe,
     FormatTypePipe,
-    ImageViewComponent
+    ImageViewComponent,
+    OptionFormComponent
   ],
   imports: [
     BrowserModule,
