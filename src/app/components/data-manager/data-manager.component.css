@@ -1,0 +1,9 @@
+.entity-content{
+  min-height: 300px;
+  background-color: white;
+  margin-bottom: 50px;
+}
+
+ul li{
+  border: none !important;
+}

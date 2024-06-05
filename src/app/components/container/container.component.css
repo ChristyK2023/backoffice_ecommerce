@@ -1,0 +1,35 @@
+table td:last-child,
+table th:last-child{
+   text-align: right;
+}
+
+table td{
+  vertical-align: middle;
+}
+
+.empty-box{
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+table{
+  background-color: white;
+}
+
+.entityNames{
+  background-color: white;
+  top: 50px;
+  right: 0;
+  min-width: 150;
+  max-height: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.entityNames ul {
+  list-style: none;
+  padding: 0;
+}

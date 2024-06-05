@@ -1,0 +1,194 @@
+<h2>{{ pageName }}</h2>
+<app-loading *ngIf="isLoading"></app-loading>
+<div *ngIf="!isLoading">
+    <!-- Affichage de la pagination -->
+    <app-pagination
+        *ngIf="datas.length"
+        [current]="result.current"
+        [allCount]="result.allCount"
+        [next]="result.next"
+        [previous]="result.previous"
+        [pageLimit]="pageLimit"
+        (pageSelected)="setPage($event)"
+    >
+    </app-pagination>
+    <!-- Affichage du champ de recherche -->
+    <app-search-form
+        *ngIf="datas.length || query"
+        [name]="entityNames[0]"
+        (newValue)="searchData($event)"
+    ></app-search-form>
+    <div *ngIf="query">
+        Resultat de recherche avec le mot clé :
+        <strong>{{ searchTag }}</strong>
+    </div>
+    <!-- Container des données -->
+    <div
+        class="table-container"
+        *ngIf="result?.allCount"
+    >
+        <!-- Affiche le nombre de lignes dans la table -->
+        <p *ngIf="result?.allCount > 1">
+            <strong>{{ result?.allCount }}</strong>
+            données retrouvées
+        </p>
+        <p *ngIf="result?.allCount === 1">
+            <strong>{{ result?.allCount }}</strong>
+            donnée retrouvée
+        </p>
+        <!-- J'ajoute le bouton Add New et la box de selection des colones -->
+        <div class="d-flex gap-2 py-2 justify-content-end relative">
+            <button class="btn btn-success">
+                <i class="fa fa-plus"></i>
+                Add New
+            </button>
+            <button
+                class="btn btn-success"
+                (click)="setDisplaySelectionBox()"
+            >
+                <i class="fa-solid fa-layer-group"></i>
+            </button>
+            <!-- Je remplis la box de sélection -->
+            <div
+                class="entityNames absolute shadow p-2"
+                *ngIf="displaySelectionBox"
+            >
+                <ul>
+                    <li *ngFor="let entityName of entityNamesAll; let first = first">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            [checked]="first || entityNames.includes(entityName)"
+                            [disabled]="first"
+                            (change)="setEntityNames($event, entityName)"
+                            name
+                            id
+                        >
+                        {{ entityName | formatName }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <!-- Cas ou les données existent -->
+        <table class="table shadow table-responsive">
+            <thead>
+                <tr>
+                    <th scope="col">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name
+                            id
+                        >
+                    </th>
+                    <th scope="col">N°</th>
+                    <th
+                        scope="col"
+                        *ngFor="let name of entityNames"
+                    >
+                        {{ name | formatName }}
+                    </th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let data of datas; let index = index">
+                    <td scope="row">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name
+                            id
+                        >
+                    </td>
+                    <td scope="row">
+                        {{ result?.allCount - (result.current - 1) * pageLimit - index }}
+                    </td>
+                    <td
+                        *ngFor="let name of entityNames"
+                        (click)="setImageView(name, data)"
+                    >
+                        <div [innerHTML]="getValue(data, name) | formatTag : searchTag | formatValue: [name, data]"></div>
+                    </td>
+                    <td>
+                        <a
+                            [routerLink]="[data._id, 'view']"
+                            class="btn btn-success m-1"
+                        >
+                            <i class="fa-solid fa-eye"></i>
+                        </a>
+                        <a
+                            [routerLink]="[data._id, 'edit']"
+                            class="btn btn-primary m-1"
+                        >
+                            <i class="fa-solid fa-edit"></i>
+                        </a>
+                        <a
+                            href
+                            class="btn btn-danger m-1"
+                        >
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- Affiche l'image dans un modal -->
+        <app-image-preview
+            *ngIf="imageUrl"
+            [src]="imageUrl"
+            (closeModal)="setImageView(null, null)"
+        >
+        </app-image-preview>
+        <!-- Sélectionne le nombre de lignes a afficher dans une table -->
+        <div class="d-flex justify-content-end">
+            <div class="item-par-page">
+                Item per page
+                <select
+                    name="pageLimit"
+                    id="pageLimit"
+                    (change)="setPageLimit($event)"
+                >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="100">100</option>
+                </select>
+            </div>
+        </div>
+        <!-- Affichage de la pagination -->
+        <app-pagination
+            [current]="result.current"
+            [allCount]="result.allCount"
+            [next]="result.next"
+            [previous]="result.previous"
+            [pageLimit]="pageLimit"
+            (pageSelected)="setPage($event)"
+        >
+        </app-pagination>
+        <!-- Affiche le nombre de lignes dans la table -->
+        <p *ngIf="result?.allCount > 1">
+            <strong>{{ result?.allCount }}</strong>
+            données retrouvées
+        </p>
+        <p *ngIf="result?.allCount === 1">
+            <strong>{{ result?.allCount }}</strong>
+            donnée retrouvée
+        </p>
+    </div>
+    <!-- Cas ou les données n'existent pas -->
+    <div
+        *ngIf="!datas.length && !query"
+        class="empty-box shadow"
+    >
+        <p>Aucune données disponible</p>
+        <a
+            class="btn btn-success"
+            routerLink="add"
+        >
+            <i class="fa fa-plus"></i>
+            Ajouter
+        </a>
+    </div>
+</div>
