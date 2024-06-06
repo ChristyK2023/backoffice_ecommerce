@@ -33,7 +33,10 @@
         </div>
         <!-- On affiche une option -->
         <div *ngIf="(name | formatType: data) === 'OPTION'">
-            <app-option-form [options]="name | formatFormValue : data"></app-option-form>
+            <app-option-form
+                [options]="name | formatFormValue : data"
+                (emitOption)="handleUpdateOption($event)"
+            ></app-option-form>
         </div>
     </div>
     <!-- Affichage des boutons d'actions -->

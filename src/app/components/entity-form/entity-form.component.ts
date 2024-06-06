@@ -12,6 +12,7 @@ export class EntityFormComponent {
   @Input() data : any;
 
   form: any;
+  formData: any = {};
 
   @Output() formEmit = new EventEmitter<any>()
 
@@ -52,6 +53,12 @@ export class EntityFormComponent {
      */
 
     this.formEmit.emit({type: "NORMAL", form: this.form.value})
+
+  }
+
+  handleUpdateOption(data: any) {
+    this.formData["options"] = data
+    console.log(this.formData);
 
   }
 
