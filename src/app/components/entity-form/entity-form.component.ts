@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
+import { EntityService } from '../../services/entity.service';
+import { lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-entity-form',
@@ -13,12 +15,17 @@ export class EntityFormComponent {
 
   form: any;
   formData: any = {};
+  categories: any;
+  categoriesSelected: any;
 
   @Output() formEmit = new EventEmitter<any>()
 
-  constructor (private fb: FormBuilder) {}
+  constructor (
+    private fb: FormBuilder,
+    private entityService: EntityService
+  ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
 
     console.log({entityNames: this.entityNames});
 
@@ -31,8 +38,17 @@ export class EntityFormComponent {
       }
       return true
     })
+    // On vérifie si categories est inclu dans entityNames
+    if (this.entityNames.includes("categories")) {
+      const data: any = await lastValueFrom(
+        this.entityService.getDatas("category")
+      )
+      this.categoriesSelected = this.data["categories"]
+      this.categories = data.results
+    }
 
     this.initForm()
+    this.initSelect()
 
   }
 
@@ -44,6 +60,39 @@ export class EntityFormComponent {
     })
     this.form = this.fb.group(formObject)
   }
+  // Initialise le select
+  initSelect() {
+     /**
+     *Je gere l'intégration du select2 (C'est une librairie externe)
+     *Cette libraire sert a designer une liste de sélection
+     */
+     const WD : any = window
+     const $ = WD.jQuery
+     const self = this
+
+     $(document).ready(function() {
+       $('.select-categories').select2();
+       $('.single-select').select2();
+       $('.select-categories').on('select2:select', function(event: any){
+        const values = $('.select-categories').select2("val")
+        self.formData["categories"] = values
+       })
+
+       $('.select-categories').select2();
+       $('.select-categories').on('select2:unselect', function(event: any){
+        const values = $('.select-categories').select2("val")
+        self.formData["categories"] = values
+       })
+
+       $('.single-select').on('select2:select', function(event: any){
+          const { name, value } = event.target
+          self.formData[name] = value
+       })
+
+
+     });
+  }
+
   // Fonction qui soumet le formulaire
   handleSubmit() {
     /**
@@ -52,14 +101,17 @@ export class EntityFormComponent {
      * Images
      */
 
-    this.formEmit.emit({type: "NORMAL", form: this.form.value})
+    const data = { ...this.form.value, ...this.formData}
+
+    this.formEmit.emit({type: "NORMAL", form: data})
 
   }
 
   handleUpdateOption(data: any) {
     this.formData["options"] = data
-    console.log(this.formData);
-
   }
+
+
+
 
 }

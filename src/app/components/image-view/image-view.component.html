@@ -1,6 +1,6 @@
 <div class="row">
     <div
-        class="col-md-4 p-2"
+        class="col-md-3 p-2"
         *ngFor="let url of imageUrls"
     >
         <img
@@ -8,8 +8,18 @@
             alt
         >
         <div class="d-flex gap-2 justify-content-center p-1">
-            <button class="btn btn-success">Changer</button>
-            <button class="btn btn-danger">Supprimer</button>
+            <button class="btn btn-success">
+                <i class="fa fa-edit"></i>
+            </button>
+            <button class="btn btn-danger">
+                <i class="fa fa-trash"></i>
+            </button>
         </div>
+    </div>
+    <div class="col-md-3 p-2">
+        <button class="btn btn-success">
+            <i class="fa fa-plus"></i>
+            Ajouter Image
+        </button>
     </div>
 </div>

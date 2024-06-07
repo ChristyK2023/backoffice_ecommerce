@@ -18,14 +18,45 @@
         >
         <!-- On affiche SELECT quand Type = "SELECT" -->
         <select
-            class="form-control"
-            name
+            class="form-control single-select"
+            [name]="name"
             id
             *ngIf="(name | formatType: data) === 'SELECT'"
             [formControlName]="name"
         >
-            <option value>YES</option>
-            <option value>NO</option>
+            <option
+                [value]="true"
+                [selected]="(name | formatFormValue : data) == true"
+            >
+                YES
+            </option>
+            <option
+                [value]="false"
+                [selected]="(name | formatFormValue : data) == false"
+            >
+                NO
+            </option>
+        </select>
+        <!-- On affiche SELECT quand Type = "CURRENCY" -->
+        <select
+            class="form-control single-select"
+            [name]="name"
+            id
+            *ngIf="(name | formatType: data) === 'CURRENCY'"
+            [formControlName]="name"
+        >
+            <option
+                value="EUR"
+                [selected]="(name | formatFormValue : data) == 'EUR'"
+            >
+                EUR
+            </option>
+            <option
+                value="USD"
+                [selected]="(name | formatFormValue : data) == 'USD'"
+            >
+                USD
+            </option>
         </select>
         <!-- On affiche l'image -->
         <div *ngIf="(name | formatType: data) === 'IMAGE'">
@@ -37,6 +68,22 @@
                 [options]="name | formatFormValue : data"
                 (emitOption)="handleUpdateOption($event)"
             ></app-option-form>
+        </div>
+        <!-- On affiche une catégorie -->
+        <div *ngIf="(name | formatType: data) === 'SELECT_CATEGORIES'">
+            <select
+                class="form-control select-categories"
+                name="categories[]"
+                multiple="multiple"
+            >
+                <option
+                    [value]="category._id"
+                    [selected]="categoriesSelected.includes(category._id)"
+                    *ngFor="let category of categories"
+                >
+                    {{ category.name }}
+                </option>
+            </select>
         </div>
     </div>
     <!-- Affichage des boutons d'actions -->
