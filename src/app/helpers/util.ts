@@ -8,3 +8,21 @@ export const generateId = () => {
     return (Math.random() * 16 | 0).toString(16);
   }).toLowerCase();
 }
+
+export const getExtension = (filename: String) => {
+  var parts = filename.split('.');
+  return parts[parts.length - 1]
+}
+
+export const isImage = (filename: String) => {
+  var ext = getExtension(filename);
+  switch (ext.toLowerCase()) {
+    case 'jpg':
+    case 'gif':
+    case 'bmp':
+    case 'png':
+
+    return true;
+  }
+  return false;
+}

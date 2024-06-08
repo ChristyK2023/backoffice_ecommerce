@@ -17,6 +17,7 @@ export class EntityFormComponent {
   formData: any = {};
   categories: any;
   categoriesSelected: any;
+  files: any;
 
   @Output() formEmit = new EventEmitter<any>()
 
@@ -103,7 +104,11 @@ export class EntityFormComponent {
 
     const data = { ...this.form.value, ...this.formData}
 
-    this.formEmit.emit({type: "NORMAL", form: data})
+    if (this.files?.length) {
+      data["files"] = this.files
+    }
+
+    this.formEmit.emit({...data})
 
   }
 
@@ -111,7 +116,9 @@ export class EntityFormComponent {
     this.formData["options"] = data
   }
 
-
+  handleChangeFile(files: any) {
+    this.files = files
+  }
 
 
 }

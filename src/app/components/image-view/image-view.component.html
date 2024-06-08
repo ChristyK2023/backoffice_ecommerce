@@ -1,25 +1,56 @@
 <div class="row">
     <div
         class="col-md-3 p-2"
-        *ngFor="let url of imageUrls"
+        *ngFor="let item of availableFiles"
     >
-        <img
-            [src]="url"
-            alt
+        <div
+            class="image-item"
+            *ngIf="item.action !== 'DELETE'"
         >
-        <div class="d-flex gap-2 justify-content-center p-1">
-            <button class="btn btn-success">
-                <i class="fa fa-edit"></i>
-            </button>
-            <button class="btn btn-danger">
-                <i class="fa fa-trash"></i>
-            </button>
+            <img
+                [src]="item.imageUrl"
+                alt
+                (click)="setImageView(item.imageUrl)"
+                class="shadow"
+            >
+            <div class="d-flex gap-2 justify-content-center p-1">
+                <button
+                    class="btn btn-success"
+                    (click)="updateImage(item.imageUrl)"
+                >
+                    <i class="fa fa-edit"></i>
+                </button>
+                <button
+                    class="btn btn-danger"
+                    (click)="removeImage(item.imageUrl)"
+                >
+                    <i class="fa fa-trash"></i>
+                </button>
+            </div>
         </div>
     </div>
     <div class="col-md-3 p-2">
-        <button class="btn btn-success">
+        <input
+            type="file"
+            name="file"
+            id="file"
+            class="none"
+            (change)="addFile($event)"
+        >
+        <button
+            class="btn btn-success"
+            (click)="handleAddFile($event)"
+        >
             <i class="fa fa-plus"></i>
             Ajouter Image
         </button>
+        <!-- Affiche un message d'erreur au cas ou
+          on selectionne un fichier qui n'est pas un fichier image -->
+        {{ errorMessage }}
     </div>
+    <app-image-preview
+        *ngIf="imageUrl"
+        [src]="imageUrl"
+        (closeModal)="setImageView(null)"
+    ></app-image-preview>
 </div>

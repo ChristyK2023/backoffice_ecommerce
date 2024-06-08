@@ -60,7 +60,10 @@
         </select>
         <!-- On affiche l'image -->
         <div *ngIf="(name | formatType: data) === 'IMAGE'">
-            <app-image-view [imageUrls]="name | formatFormValue : data"></app-image-view>
+            <app-image-view
+                (emitFile)="handleChangeFile($event)"
+                [imageUrls]="name | formatFormValue : data"
+            ></app-image-view>
         </div>
         <!-- On affiche une option -->
         <div *ngIf="(name | formatType: data) === 'OPTION'">
