@@ -43,57 +43,64 @@ export class ImageViewComponent {
   }
 
   addFile(event: any) {
-    const file = event.target.files[0]
+    const files = event.target.files[0]
     const self: any = this
 
-    if (!isImage(file.name)) {
-      this.errorMessage = "Error file type !"
-      return
-    }
-    this.errorMessage = ""
+    for (let index = 0; index < files.length; index++) {
+      const file = files[index];
 
-    if (file) {
-      let fileReader = new FileReader();
-      fileReader.readAsDataURL(file)
-      fileReader.onload = function() {
-        if (self.isUpdating) {
-          // Update
-          const url = self.isUpdating // ancien url
+      if (!isImage(file.name)) {
+        this.errorMessage = "Error file type !"
+        return
+      }
+      this.errorMessage = ""
 
-          self.files = self.files.map((fileItem: any) => {
-            if (fileItem.imageUrl === url) {
+      if (file) {
+        let fileReader = new FileReader();
+        fileReader.readAsDataURL(file)
+        fileReader.onload = function() {
+          if (self.isUpdating) {
+            // Update
+            const url = self.isUpdating // ancien url
 
-              if (fileItem.action === "OLD") {
+            self.files = self.files.map((fileItem: any) => {
+              if (fileItem.imageUrl === url) {
 
-                fileItem.imageUrl = fileReader.result
-                fileItem.file = file
-                fileItem.action = "UPDATE"
+                if (fileItem.action === "OLD") {
 
-              }else{
+                  fileItem.imageUrl = fileReader.result
+                  fileItem.file = file
+                  fileItem.action = "UPDATE"
 
-                fileItem.imageUrl = fileReader.result
-                fileItem.file = file
+                }else{
+
+                  fileItem.imageUrl = fileReader.result
+                  fileItem.file = file
+
+                }
 
               }
 
-            }
+              return fileItem
 
-            return fileItem
+            })
+            self.isUpdating = false
 
-          })
-          self.isUpdating = false
-
-        } else {
-          // Add
-          self.files.push({
-            imageUrl: fileReader.result,
-            action: "ADD",
-            file
-          })
+          } else {
+            // Add
+            self.files.push({
+              imageUrl: fileReader.result,
+              action: "ADD",
+              file
+            })
+          }
+          self.updateFile()
         }
-        self.updateFile()
       }
+
     }
+
+
   }
 
   removeImage(url: String) {

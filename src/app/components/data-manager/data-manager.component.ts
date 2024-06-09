@@ -86,8 +86,47 @@ export class DataManagerComponent {
   }
 
   handleFormChange(data: any) {
-    console.log(data);
+
+    let formData: any = {}
+    const entity: any = this.entity
+
+    if (data?.files && !data?.files?.length) {
+      // Upload File
+      //On supprime le file
+      const files = data.files
+      delete data.files
+
+      //On ajoute les données
+      formData = new FormData()
+      formData.append([entity], JSON.stringify(data))
+
+      // ADD or UPDATE
+      files.filter((fileItem: any) => fileItem.action !== "DELETE").forEach((fileItem: any) => {
+        formData.append("file", fileItem.file)
+      })
+
+      // DELETE
+      const deleteFiles = files.filter((fileItem: any) => ["DELETE", "UPDATE"].includes(fileItem.action))
+      .map((fileItem: any) => fileItem.oldImage)
+      formData.append("deleteFiles", JSON.stringify(deleteFiles))
+
+    }else{
+      // Upload Normal
+      formData[entity] = data
+    }
+
     // SAVE DATA
+    if (formData) {
+      console.log(formData);
+
+      this.entityService.updateData(this.entity, this.entityId, formData).subscribe({
+        next: (value: any)=>{
+          console.log(value);
+
+        },
+      })
+    }
+
   }
 
 }

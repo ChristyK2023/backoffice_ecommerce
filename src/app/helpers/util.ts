@@ -21,6 +21,7 @@ export const isImage = (filename: String) => {
     case 'gif':
     case 'bmp':
     case 'png':
+    case 'webp':
 
     return true;
   }

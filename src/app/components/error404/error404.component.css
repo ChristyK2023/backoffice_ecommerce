@@ -1,0 +1,15 @@
+h2{
+  font-size: 15rem;
+  text-align: center;
+  color: var(--main-color);
+}
+
+.error-page{
+  text-align: center;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+}
