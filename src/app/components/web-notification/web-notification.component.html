@@ -1,0 +1,13 @@
+<div class="alert-container">
+    <div
+        class="d-flex alert alert-{{ notification.status }}"
+        *ngFor="let notification of notifications"
+        role="alert"
+    >
+        <span
+            class="btn-close"
+            (click)="closeNotif(notification._id)"
+        ></span>
+        <div [innerHTML]="notification?.message"></div>
+    </div>
+</div>

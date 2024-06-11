@@ -38,10 +38,13 @@
         </p>
         <!-- J'ajoute le bouton Add New et la box de selection des colones -->
         <div class="d-flex gap-2 py-2 justify-content-end relative">
-            <button class="btn btn-success">
+            <a
+                class="btn btn-success"
+                [routerLink]="['/', pagePath, 'add']"
+            >
                 <i class="fa fa-plus"></i>
                 Add New
-            </button>
+            </a>
             <button
                 class="btn btn-success"
                 (click)="setDisplaySelectionBox()"

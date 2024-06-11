@@ -1,4 +1,5 @@
 export const actions = [
   "view",
-  "edit"
+  "edit",
+  "add"
 ]

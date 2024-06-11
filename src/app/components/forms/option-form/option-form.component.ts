@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { generateId } from '../../../helpers/util';
+import { WebNotificationService } from '../../../services/web-notification.service';
 
 @Component({
   selector: 'app-option-form',
@@ -11,7 +12,7 @@ export class OptionFormComponent {
   @Input() options: any;
   @Output() emitOption = new EventEmitter<any>()
 
-  constructor () { }
+  constructor (private notificationService: WebNotificationService) { }
 
   ngOnInit() {
     this.options = this.options ? this.options : []
@@ -28,6 +29,10 @@ export class OptionFormComponent {
           name: "Option Value"
         }
       ]
+    })
+    this.notificationService.emitNotification({
+      status: "success",
+      message: "New Option Added !"
     })
   }
   // Modifier une option
@@ -68,8 +73,11 @@ export class OptionFormComponent {
           name: "Option Value"
         })
       }
-
       return option
+    })
+    this.notificationService.emitNotification({
+      status: "success",
+      message: "New Value Added !"
     })
   }
   // Suppression des options
@@ -78,6 +86,11 @@ export class OptionFormComponent {
       option._id !== optionId
     )
     this.emitOption.emit(this.options)
+
+    this.notificationService.emitNotification({
+      status: "danger",
+      message: "Option Deleted !"
+    })
   }
   // Suppression des valeurs
   removeOptionValue(optionId: String, valueId: String) {
@@ -90,6 +103,11 @@ export class OptionFormComponent {
       return option
     })
     this.emitOption.emit(this.options)
+
+    this.notificationService.emitNotification({
+      status: "danger",
+      message: "Value Deleted !"
+    })
   }
 
 }

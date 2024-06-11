@@ -1,18 +1,21 @@
+import { WebNotificationService } from './../../services/web-notification.service';
 import { LoadingComponent } from './../loading/loading.component';
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { routes } from '../../helpers/routes';
 import { actions } from '../../helpers/actions';
 import { formateTCamelCase } from '../../helpers/util';
 import { EntityService } from '../../services/entity.service';
 import { getEntityPorperties } from '../../helpers/helpers';
+import { NotificationModel } from '../../models/notification-model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-data-manager',
   templateUrl: './data-manager.component.html',
   styleUrl: './data-manager.component.css'
 })
-export class DataManagerComponent {
+export class DataManagerComponent implements OnInit, OnDestroy {
 
   entity: any;
   entityId: any;
@@ -21,13 +24,15 @@ export class DataManagerComponent {
   entityNamesAll: any;
   result: any;
   data: any;
+  getDataById$ = new Subscription()
   routes: Array<any> = routes
   actions: Array<String> = actions
 
   constructor (
     private route: ActivatedRoute,
     private router: Router,
-    private entityService: EntityService
+    private entityService: EntityService,
+    private notificationService: WebNotificationService
   ) {}
 
   ngOnInit() {
@@ -35,7 +40,7 @@ export class DataManagerComponent {
     window.scrollTo(0,0)
 
     const urls = this.route.snapshot.url
-    if (urls.length < 3) {
+    if (urls.length < 2) {
       this.router.navigate(["/error"])
     }
     this.entity = urls[0]?.path
@@ -59,6 +64,8 @@ export class DataManagerComponent {
     if (routeObject[0]) {
       this.pageName = formateTCamelCase(this.action) +" "+ routeObject[0]?.single
     }
+    console.log({pageName: this.pageName});
+
 
     // On récupere les champs des différentes entités
     this.entityNamesAll = getEntityPorperties(this.entity)
@@ -68,7 +75,7 @@ export class DataManagerComponent {
   }
 
   getDataById() {
-    this.entityService.getDataById(this.entity, this.entityId).subscribe({
+    this.getDataById$ = this.entityService.getDataById(this.entity, this.entityId).subscribe({
       next: (value: any)=>{
         console.log(value);
         this.result = value
@@ -122,11 +129,22 @@ export class DataManagerComponent {
       this.entityService.updateData(this.entity, this.entityId, formData).subscribe({
         next: (value: any)=>{
           console.log(value);
-
+          const message = "Update success"
+          const status  = "success"
+          this.notificationService.emitNotification({message, status})
         },
+        error: (error: any) => {
+          const message = "Update error"
+          const status  = "danger"
+          this.notificationService.emitNotification({message, status})
+        }
       })
     }
 
+  }
+
+  ngOnDestroy(): void {
+    this.getDataById$.unsubscribe()
   }
 
 }

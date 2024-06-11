@@ -34,6 +34,10 @@ const routes: Routes = [
     component: DataManagerComponent
   },
   {
+    path: ":entity/:action",
+    component: DataManagerComponent
+  },
+  {
     path: "**",
     component: Error404Component
   }

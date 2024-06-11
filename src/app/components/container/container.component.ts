@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterEvent } from '@angular/router';
 import { EntityService } from '../../services/entity.service';
 import { getEntityPorperties } from '../../helpers/helpers';
 import { routes } from '../../helpers/routes';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-container',
   templateUrl: './container.component.html',
   styleUrl: './container.component.css'
 })
-export class ContainerComponent implements OnInit{
+export class ContainerComponent implements OnInit, OnDestroy{
 
   pagePath: string = ""
   pageName: string = ""
@@ -25,6 +26,8 @@ export class ContainerComponent implements OnInit{
   searchTag: String = ""
   displaySelectionBox: Boolean = false;
   imageUrl: String | null = null
+  getDatasByPage$ = new Subscription()
+  searchDataByPage$ = new Subscription()
 
   constructor (
     private route: ActivatedRoute,
@@ -89,7 +92,7 @@ export class ContainerComponent implements OnInit{
 
     if (this.query) {
 
-      this.entityService.searchDataByPage(this.pagePath, this.query, this.pageNumber, this.pageLimit).subscribe({
+      this.searchDataByPage$ = this.entityService.searchDataByPage(this.pagePath, this.query, this.pageNumber, this.pageLimit).subscribe({
 
         next: (data: any)=>{
 
@@ -112,7 +115,7 @@ export class ContainerComponent implements OnInit{
 
     } else {
 
-      this.entityService.getDatasByPage(this.pagePath, this.pageNumber, this.pageLimit).subscribe({
+      this.getDatasByPage$ = this.entityService.getDatasByPage(this.pagePath, this.pageNumber, this.pageLimit).subscribe({
 
         next: (data: any)=>{
 
@@ -191,6 +194,11 @@ export class ContainerComponent implements OnInit{
       const value: any = window.localStorage.getItem(key)
       return JSON.parse(value)
     }
+  }
+
+  ngOnDestroy(): void {
+    this.getDatasByPage$.unsubscribe()
+    this.searchDataByPage$.unsubscribe()
   }
 
 
