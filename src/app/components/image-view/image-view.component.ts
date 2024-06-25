@@ -43,7 +43,7 @@ export class ImageViewComponent {
   }
 
   addFile(event: any) {
-    const files = event.target.files[0]
+    const files = event.target.files
     const self: any = this
 
     for (let index = 0; index < files.length; index++) {

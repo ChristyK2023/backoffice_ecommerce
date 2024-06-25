@@ -1,9 +1,12 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 
 @Pipe({
   name: 'formatValue'
 })
 export class FormatValuePipe implements PipeTransform {
+
+  constructor (private _sanitizer:DomSanitizer) { }
 
   transform(value: any, args: Array<any>): unknown {
 
@@ -13,7 +16,8 @@ export class FormatValuePipe implements PipeTransform {
 
     if (name == "imageUrls"){
       const url = value[0]
-      newValue = `<img src="${url}" width="50" height="50" />`
+      newValue = `<img src="${url}"min-width="50%" height="50"/>`
+      //newValue = `<img src="${url}" width="50" height="50" />`
     }
 
     // Formatage de la devise sur le champ "solde_price"
@@ -32,7 +36,8 @@ export class FormatValuePipe implements PipeTransform {
       ).format(value)
     }
 
-    return newValue;
+    return this._sanitizer.bypassSecurityTrustHtml(newValue);
+    //return newValue;
   }
 
 }

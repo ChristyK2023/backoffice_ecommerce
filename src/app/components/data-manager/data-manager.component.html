@@ -20,9 +20,11 @@
     </ul>
     <!-- On affiche le formulaire d'édition -->
     <app-entity-form
-        *ngIf="action=='edit'"
+        *ngIf="action=='edit' || action=='add'"
         [entityNames]="entityNamesAll"
         [data]="data"
+        [entity]="entity"
+        [formType]="action"
         (formEmit)="handleFormChange($event)"
     ></app-entity-form>
 </div>

@@ -4,9 +4,9 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { routes } from '../../helpers/routes';
 import { actions } from '../../helpers/actions';
-import { formateTCamelCase } from '../../helpers/util';
+import { formateToCamelCase } from '../../helpers/util';
 import { EntityService } from '../../services/entity.service';
-import { getEntityPorperties } from '../../helpers/helpers';
+import { getEntity, getEntityPorperties } from '../../helpers/helpers';
 import { NotificationModel } from '../../models/notification-model';
 import { Subscription } from 'rxjs';
 
@@ -43,9 +43,15 @@ export class DataManagerComponent implements OnInit, OnDestroy {
     if (urls.length < 2) {
       this.router.navigate(["/error"])
     }
-    this.entity = urls[0]?.path
-    this.entityId = urls[1].path
-    this.action = urls[2].path
+
+    if (urls.length == 3) {
+      this.entity = urls[0]?.path
+      this.entityId = urls[1].path
+      this.action = urls[2].path
+    }else if (urls.length == 2) {
+      this.entity = urls[0]?.path
+      this.action = urls[1].path
+    }
 
     const isEntityExist = routes.filter(
       (route: any)=> route.path === "/"+this.entity
@@ -62,14 +68,23 @@ export class DataManagerComponent implements OnInit, OnDestroy {
     const routeObject:any = this.routes.filter(route => route.path === "/"+this.entity)
 
     if (routeObject[0]) {
-      this.pageName = formateTCamelCase(this.action) +" "+ routeObject[0]?.single
+      this.pageName = formateToCamelCase(this.action) +" "+ routeObject[0]?.single
     }
     console.log({pageName: this.pageName});
 
 
     // On récupere les champs des différentes entités
     this.entityNamesAll = getEntityPorperties(this.entity)
-    this.getDataById()
+    if (["view", "edit"].includes(this.action)) {
+      this.getDataById()
+    }else if (this.action == "add") {
+      //
+      this.data = getEntity(this.entity)
+      console.log(this.data);
+
+
+    }
+
     //console.log(this.entity, this.entityId, this.action);
 
   }
@@ -126,19 +141,36 @@ export class DataManagerComponent implements OnInit, OnDestroy {
     if (formData) {
       console.log(formData);
 
-      this.entityService.updateData(this.entity, this.entityId, formData).subscribe({
-        next: (value: any)=>{
-          console.log(value);
-          const message = "Update success"
-          const status  = "success"
-          this.notificationService.emitNotification({message, status})
-        },
-        error: (error: any) => {
-          const message = "Update error"
-          const status  = "danger"
-          this.notificationService.emitNotification({message, status})
-        }
-      })
+      if (this.action === "edit") {
+        this.entityService.updateData(this.entity, this.entityId, formData).subscribe({
+          next: (value: any)=>{
+            console.log(value);
+            const message = "Update success"
+            const status  = "success"
+            this.notificationService.emitNotification({message, status})
+          },
+          error: (error: any) => {
+            const message = "Update error"
+            const status  = "danger"
+            this.notificationService.emitNotification({message, status})
+          }
+        })
+      }else if (this.action === "add") {
+        this.entityService.addData(this.entity, formData).subscribe({
+          next: (value: any)=>{
+            console.log(value);
+            const message = "Add success"
+            const status  = "success"
+            this.notificationService.emitNotification({message, status})
+          },
+          error: (error: any) => {
+            const message = "Add error"
+            const status  = "danger"
+            this.notificationService.emitNotification({message, status})
+          }
+        })
+      }
+
     }
 
   }

@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterEvent } from '@angular/router';
 import { EntityService } from '../../services/entity.service';
 import { getEntityPorperties } from '../../helpers/helpers';
 import { routes } from '../../helpers/routes';
-import { Subscription } from 'rxjs';
+import { Subscription, lastValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-container',
@@ -12,7 +12,8 @@ import { Subscription } from 'rxjs';
 })
 export class ContainerComponent implements OnInit, OnDestroy{
 
-  pagePath: string = ""
+  entity: String = ""
+  //pagePath: string = ""
   pageName: string = ""
   pageNumber: number = 1
   pageLimit: number = 5
@@ -20,43 +21,51 @@ export class ContainerComponent implements OnInit, OnDestroy{
   result: any;
   entityNames: Array<String> = []; // Propriétés qu'on souhaite afficher
   entityNamesAll: Array<String> = []; // Affiche toutes les propriétés
+  groupe: Array<String> = []; // Contient tous les elements a supprimer
   isLoading: Boolean = true;
   routes: Array<any> = routes
   query: String = ""
   searchTag: String = ""
+  modalTitle: String = ""
+  modalContent: String = ""
+  entityDelete: any
+  isDeleting: Boolean = false
   displaySelectionBox: Boolean = false;
   imageUrl: String | null = null
   getDatasByPage$ = new Subscription()
   searchDataByPage$ = new Subscription()
 
+
   constructor (
     private route: ActivatedRoute,
     private entityService: EntityService
-  ) { }
+  ) {
+
+    }
 
   ngOnInit(): void {
     this.initComp()
     this.getDatasByPage()
-
   }
 
-  getValue(data: any, name: String) {
+  getValue(data: any, name: any) {
     const index: any = name
     return data[index]
   }
 
   initComp(){
 
-    this.pagePath = this.route.snapshot.url[0]?.path || "product"
+    this.entity = this.route.snapshot.url[0]?.path || "product"
 
-    const routeObject:any = this.routes.filter(route => route.path === "/"+this.pagePath)
+    // Récupere le titre de la page
+    const routeObject:any = this.routes.filter(route => route.path === "/"+this.entity)
     if (routeObject[0]) {
       this.pageName = routeObject[0]?.name
     }
 
     // Récupere les proprités de l'entité sur lequel on se trouve
-    this.entityNamesAll = getEntityPorperties(this.pagePath)
-    const localData = this.getLocalData(this.pagePath)
+    this.entityNamesAll = getEntityPorperties(this.entity)
+    const localData = this.getLocalData(this.entity)
     //console.log({localData});
 
     this.entityNames = localData ? localData?.entityNames : [this.entityNamesAll[0]]
@@ -92,7 +101,7 @@ export class ContainerComponent implements OnInit, OnDestroy{
 
     if (this.query) {
 
-      this.searchDataByPage$ = this.entityService.searchDataByPage(this.pagePath, this.query, this.pageNumber, this.pageLimit).subscribe({
+      this.searchDataByPage$ = this.entityService.searchDataByPage(this.entity, this.query, this.pageNumber, this.pageLimit).subscribe({
 
         next: (data: any)=>{
 
@@ -115,7 +124,7 @@ export class ContainerComponent implements OnInit, OnDestroy{
 
     } else {
 
-      this.getDatasByPage$ = this.entityService.getDatasByPage(this.pagePath, this.pageNumber, this.pageLimit).subscribe({
+      this.getDatasByPage$ = this.entityService.getDatasByPage(this.entity, this.pageNumber, this.pageLimit).subscribe({
 
         next: (data: any)=>{
 
@@ -161,7 +170,7 @@ export class ContainerComponent implements OnInit, OnDestroy{
       )
     }
 
-    const index : any = this.pagePath
+    const index : any = this.entity
     let data: any = {"entityNames": this.entityNames}
 
     this.saveLocalData(index, data)
@@ -196,7 +205,100 @@ export class ContainerComponent implements OnInit, OnDestroy{
     }
   }
 
-  ngOnDestroy(): void {
+  handleDelete(data: any) {
+    const index: any = this.entityNames[0]
+    if (data) {
+      // Nous sommes dans le cas ou on veut supprimer une ligne
+      const name = data[index]
+      this.isDeleting = true
+      this.entityDelete = data
+      this.modalTitle = "Confirm Delete"
+      this.modalContent = `<p>Do you want to delete this ${this.entity} : <strong>${name}</strong> ?</p>`
+    } else {
+      // Nous sommes dans le cas de la suppression Groupé
+      if (this.groupe.length) {
+        this.isDeleting = true
+        this.entityDelete = null
+        this.modalTitle = "Confirm Delete"
+        this.modalContent = `
+        <p>Do you want to delete ${this.groupe.length} item(s) :  ?</p>`
+        this.modalContent += `<ul>`
+        this.groupe.forEach((id: String) => {
+          const item = this.datas.filter((data: any) => data._id === id)[0]
+          const name = item[index]
+          this.modalContent += `<li> ${name} </li>`
+        })
+        this.modalContent += `</ul>`
+      }
+    }
+
+  }
+
+  handleCloseModal(event: any) {
+    this.isDeleting = false
+    this.entityDelete = null
+    this.modalTitle = ""
+    this.modalContent = ""
+  }
+
+  async handleConfirmModal(event: any) {
+    ///
+    if (this.entityDelete) {
+      this.entityService.deleteData(this.entity, this.entityDelete._id).subscribe({
+        next: (value: any) => {
+          console.log(value);
+          this.getDatasByPage()
+        },
+        error: (error) => {
+          console.log(error);
+
+        }
+      })
+      this.isDeleting = false
+      this.entityDelete = null
+    }else{
+      if (this.groupe.length) {
+        await Promise.all(
+          this.groupe.map(async (id) => {
+            await lastValueFrom(this.entityService.deleteData(this.entity, id))
+          })
+        )
+
+        this.groupe = []
+        this.getDatasByPage()
+      }
+    }
+
+  }
+
+  handleGroupe(event: any, id: String) {
+    const { checked } = event.target
+    if (checked) {
+      // Cocher
+      if (!this.groupe.includes(id)) {
+        this.groupe.push(id)
+      }
+    } else {
+      // Décocher
+      this.groupe = this.groupe.filter((item: String) => item !== id)
+    }
+    console.log(this.groupe);
+  }
+
+  groupeAll(event: any) {
+    const { checked } = event.target
+    if (checked) {
+      // Cocher
+      this.groupe =  this.datas.map((data: any) => data._id)
+    } else {
+      // Décocher
+      this.groupe = []
+    }
+    console.log(this.groupe);
+  }
+
+
+  ngOnDestroy() {
     this.getDatasByPage$.unsubscribe()
     this.searchDataByPage$.unsubscribe()
   }

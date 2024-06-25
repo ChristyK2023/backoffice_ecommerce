@@ -28,8 +28,10 @@ export class WebNotificationComponent implements OnInit, OnDestroy {
 
           // On ajoute un son a nos notifications
           const audio = document.createElement("audio")
-          audio.src = "/assets/audios/notification.mp3"
+          audio.src = "/assets/audios/success.wav"
           audio.play
+
+          //src\assets\audios\success.wav
 
           const timeout: any = notification.timeout
           setTimeout(()=>{

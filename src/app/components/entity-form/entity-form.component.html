@@ -92,12 +92,17 @@
     </div>
     <!-- Affichage des boutons d'actions -->
     <div class="action d-flex justify-content-end py-1 gap-2">
-        <button class="btn btn-danger">Cancel</button>
+        <a
+            class="btn btn-danger"
+            [routerLink]="['/', entity]"
+        >
+            Cancel
+        </a>
         <button
             class="btn btn-success"
             (click)="handleSubmit()"
         >
-            Update
+            {{ formType == "add" ? "Save" : "Update" }}
         </button>
     </div>
 </form>

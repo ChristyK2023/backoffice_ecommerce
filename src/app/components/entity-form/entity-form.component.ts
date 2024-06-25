@@ -11,7 +11,10 @@ import { lastValueFrom } from 'rxjs';
 export class EntityFormComponent {
 
   @Input() entityNames : Array<string> = []
+  @Input() formType : any;
+  @Input() entity : any;
   @Input() data : any;
+
 
   form: any;
   formData: any = {};
@@ -47,6 +50,8 @@ export class EntityFormComponent {
       this.categoriesSelected = this.data["categories"]
       this.categories = data.results
     }
+
+    console.log(this.entityNames);
 
     this.initForm()
     this.initSelect()

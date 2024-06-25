@@ -36,3 +36,30 @@ export const getEntityPorperties = (entity: String): Array<String> => {
 
   return results
 }
+
+export const getEntity = (entity: String): any => {
+
+  let entityClass: any;
+
+  if (entity=="product") {
+    entityClass = new Product()
+  }
+
+  if (entity=="category") {
+    entityClass = new Category()
+  }
+
+  if (entity=="user") {
+    entityClass = new User()
+  }
+
+  if (entity=="order") {
+    entityClass = new Order()
+  }
+
+  if (entity=="contact") {
+    entityClass = new Contact()
+  }
+
+   return entityClass
+}

@@ -37,39 +37,55 @@
             donnée retrouvée
         </p>
         <!-- J'ajoute le bouton Add New et la box de selection des colones -->
-        <div class="d-flex gap-2 py-2 justify-content-end relative">
-            <a
-                class="btn btn-success"
-                [routerLink]="['/', pagePath, 'add']"
-            >
-                <i class="fa fa-plus"></i>
-                Add New
-            </a>
+        <div
+            class="d-flex gap-2 py-2 relative"
+            [ngClass]="{
+              'justify-content-between': groupe.length,
+              'justify-content-end': !groupe.length
+            }"
+        >
             <button
-                class="btn btn-success"
-                (click)="setDisplaySelectionBox()"
+                *ngIf="groupe.length"
+                class="btn btn-danger"
+                (click)="handleDelete(null)"
             >
-                <i class="fa-solid fa-layer-group"></i>
+                <i class="fa fa-trash"></i>
+                Delete ({{ groupe.length }}) item(s)
             </button>
-            <!-- Je remplis la box de sélection -->
-            <div
-                class="entityNames absolute shadow p-2"
-                *ngIf="displaySelectionBox"
-            >
-                <ul>
-                    <li *ngFor="let entityName of entityNamesAll; let first = first">
-                        <input
-                            class="form-check-input"
-                            type="checkbox"
-                            [checked]="first || entityNames.includes(entityName)"
-                            [disabled]="first"
-                            (change)="setEntityNames($event, entityName)"
-                            name
-                            id
-                        >
-                        {{ entityName | formatName }}
-                    </li>
-                </ul>
+            <div class="d-flex gap-2">
+                <a
+                    class="btn btn-success"
+                    [routerLink]="['/', entity, 'add']"
+                >
+                    <i class="fa fa-plus"></i>
+                    Add New
+                </a>
+                <button
+                    class="btn btn-success"
+                    (click)="setDisplaySelectionBox()"
+                >
+                    <i class="fa-solid fa-layer-group"></i>
+                </button>
+                <!-- Je remplis la box de sélection -->
+                <div
+                    class="entityNames absolute shadow p-2"
+                    *ngIf="displaySelectionBox"
+                >
+                    <ul>
+                        <li *ngFor="let entityName of entityNamesAll; let first = first">
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                [checked]="first || entityNames.includes(entityName)"
+                                [disabled]="first"
+                                (change)="setEntityNames($event, entityName)"
+                                name
+                                id
+                            >
+                            {{ entityName | formatName }}
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
         <!-- Cas ou les données existent -->
@@ -79,6 +95,7 @@
                     <th scope="col">
                         <input
                             class="form-check-input"
+                            (change)="groupeAll($event)"
                             type="checkbox"
                             name
                             id
@@ -100,6 +117,8 @@
                         <input
                             class="form-check-input"
                             type="checkbox"
+                            [checked]="groupe.includes(data._id)"
+                            (change)="handleGroupe($event, data._id)"
                             name
                             id
                         >
@@ -129,6 +148,8 @@
                         <a
                             href
                             class="btn btn-danger m-1"
+                            [routerLink]="['/', entity]"
+                            (click)="handleDelete(data)"
                         >
                             <i class="fa-solid fa-trash"></i>
                         </a>
@@ -195,3 +216,12 @@
         </a>
     </div>
 </div>
+<!-- Modal de la suppression d'un enregistrement*****Ce modal sert aussi a d'autres composants -->
+<!-- *ngIf="isDeleting" -->
+<app-modal
+    *ngIf="isDeleting"
+    [modalTitle]="modalTitle"
+    [modalContent]="modalContent"
+    (closeModal)="handleCloseModal($event)"
+    (confirmAction)="handleConfirmModal($event)"
+></app-modal>
